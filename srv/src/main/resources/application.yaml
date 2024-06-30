@@ -1,21 +1,30 @@
-
----
 spring:
+  application:
+    name: mspa
+  main:
+    banner-mode: off
   jpa:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.HANAColumnStoreDialect
+  liquibase:
+    change-log: db/changelog/db.changelog-master.yaml
+
+management:
+  endpoints:
+    web:
+      base-path: /management
 
 hana:
-  url: ${vcap.services.mspa-db.credentials.url}
-  user: ${vcap.services.mspa-db.credentials.user}
-  password: ${vcap.services.mspa-db.credentials.password}
+  url: ${vcap.services.marketplace-db.credentials.url}
+  user: ${vcap.services.marketplace-db.credentials.user}
+  password: ${vcap.services.marketplace-db.credentials.password}
 
 cds:
   data-source.auto-config.enabled: false
 
 multitenant:
-  defaultTenant: public
+  defaultTenant: PUBLIC
 
 
 

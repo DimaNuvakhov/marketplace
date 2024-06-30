@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import root.model.Customer;
 import root.service.CustomerService;
 
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -52,6 +51,4 @@ public class CustomerController {
         log.info("Deleting customer: [{}].", id);
         customerService.deleteById(id);
     }
-
-
 }

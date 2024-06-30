@@ -29,7 +29,6 @@ public class HibernateConfiguration {
         final LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
         entityManager.setDataSource(dataSource);
         entityManager.setPackagesToScan(Application.class.getPackageName());
-
         entityManager.setJpaVendorAdapter(jpaVendorAdapter());
 
         Map<String, Object> jpaProperties = new HashMap<>();
@@ -40,5 +39,4 @@ public class HibernateConfiguration {
         entityManager.setJpaPropertyMap(jpaProperties);
         return entityManager;
     }
-
 }

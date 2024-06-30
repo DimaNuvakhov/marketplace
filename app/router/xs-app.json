@@ -1,0 +1,12 @@
+{
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/(.*)$",
+      "destination": "srv-api",
+      "csrfProtection": false,
+      "authenticationType": "xsuaa"
+    }
+  ],
+  "welcomeFile": "app/index.html"
+}
