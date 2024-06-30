@@ -1,7 +1,21 @@
 
 ---
 spring:
-  config.activate.on-profile: default
-  sql.init.schema-locations: classpath:schema-h2.sql
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.HANAColumnStoreDialect
+
+hana:
+  url: ${vcap.services.mspa-db.credentials.url}
+  user: ${vcap.services.mspa-db.credentials.user}
+  password: ${vcap.services.mspa-db.credentials.password}
+
 cds:
   data-source.auto-config.enabled: false
+
+multitenant:
+  defaultTenant: public
+
+
+
