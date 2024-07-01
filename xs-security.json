@@ -1,0 +1,18 @@
+{
+  "xsappname": "marketplace",
+  "tenant-mode": "shared",
+  "oauth2-configuration": {
+    "redirect-uris" : ["https://*.us10-001.hana.ondemand.com/login/callback" , "https://*.us10-001.hana.ondemand.com/**"]
+  },
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.Callback",
+      "description": "With this scope set, the callbacks for tenant onboarding, offboarding and getDependencies can be called.",
+      "grant-as-authority-to-apps": [
+        "$XSAPPNAME(application,sap-provisioning,tenant-onboarding)"
+      ]
+    }
+  ],
+  "role-templates": [],
+  "role-collections": []
+}

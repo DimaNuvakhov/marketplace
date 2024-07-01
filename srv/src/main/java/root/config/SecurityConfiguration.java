@@ -49,11 +49,11 @@ public class SecurityConfiguration {
         http.authorizeHttpRequests(authz ->
                 authz.anyRequest().permitAll()
         );
+
         return http.build();
     }
 
     private Converter<Jwt, AbstractAuthenticationToken> getJwtConverter() {
-
         TokenAuthenticationConverter converter = new TokenAuthenticationConverter(xsuaaServiceConfiguration);
         converter.setLocalScopeAsAuthorities(true);
         return converter;

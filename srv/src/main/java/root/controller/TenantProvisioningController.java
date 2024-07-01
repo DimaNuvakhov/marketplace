@@ -22,8 +22,6 @@ public class TenantProvisioningController {
 
     @DeleteMapping
     public void onDelete(@PathVariable String tenantId) {
-
         log.info("Handling unsubscription callback for tenant: [{}].", tenantId);
     }
-
 }

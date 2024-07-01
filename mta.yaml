@@ -1,0 +1,129 @@
+_schema-version: '3.1'
+ID: marketplace
+version: 1.0.0-SNAPSHOT
+description: "A simple project."
+parameters:
+  enable-parallel-deployments: true
+modules:
+  - name: marketplace-srv
+    type: java
+    path: srv
+    parameters:
+      buildpack: sap_java_buildpack_jakarta
+      readiness-health-check-type: http
+      readiness-health-check-http-endpoint: /management/health
+    properties:
+      SPRING_PROFILES_ACTIVE: cloud,sandbox
+      JBP_CONFIG_COMPONENTS: "jres: ['com.sap.xs.java.buildpack.jre.SAPMachineJRE']"
+      JBP_CONFIG_SAP_MACHINE_JRE: '{ version: 17.+ }'
+    build-parameters:
+      builder: custom
+      commands:
+        - mvn clean package -DskipTests=true
+      build-result: target/*.jar
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: app-api
+        properties:
+          CDS_MULTITENANCY_APPUI_URL: ~{url}
+      - name: marketplace-auth
+
+  - name: marketplace
+    type: approuter.nodejs
+    path: app/router
+    parameters:
+      keep-existing-routes: true
+      disk-quota: 256M
+      memory: 256M
+    requires:
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api # must be used in xs-app.json as well
+          url: ~{srv-url}
+          forwardAuthToken: true
+      - name: marketplace-auth
+    provides:
+      - name: app-api
+        properties:
+          url: ${default-url}
+          application: ${app-name}
+    properties:
+      TENANT_HOST_PATTERN: '^(.*)-${app-name}.${default-domain}'
+
+resources:
+  - name: marketplace-auth
+    type: org.cloudfoundry.managed-service
+    requires:
+      - name: app-api
+    properties:
+      XSAPPNAME: ${xsuaa-app}
+    parameters:
+      service: xsuaa
+      service-plan: application
+      shared: true
+      xsuaa-app: ${space}-~{app-api/application}
+      config:
+        xsappname: ${xsuaa-app}
+        tenant-mode: shared
+        description: Security profile of called application
+        scopes:
+          - name: "$XSAPPNAME.Callback"
+            grant-as-authority-to-apps:
+              - "$XSAPPNAME(application,sap-provisioning,tenant-onboarding)"
+          - name: "$XSAPPNAME.read"
+            description: Permission for reading data
+          - name: "$XSAPPNAME.write"
+            description: Permission for writing data
+        role-templates:
+          - name: Manager
+            description: Full access to application
+            scope-references:
+              - "$XSAPPNAME.write"
+              - "$XSAPPNAME.read"
+          - name: Viewer
+            description: View content
+            scope-references:
+              - "$XSAPPNAME.read"
+        role-collections:
+          - name: MarketplaceManagerRoleCollection
+            role-template-references:
+              - "$XSAPPNAME.Manager"
+          - name: MarketplaceViewerRoleCollection
+            role-template-references:
+              - "$XSAPPNAME.Viewer"
+        oauth2-configuration:
+          token-validity: 86400
+          refresh-token-validity: 2592000
+          redirect-uris:
+            - "http*://*.${default-domain}/**"
+
+  - name: marketplace-db
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: hana
+      service-plan: schema
+      config:
+        database_id: 92fa8e2c-ca56-4624-a636-3e3d7f87167c
+
+  - name: marketplace-saas
+    type: org.cloudfoundry.managed-service
+    requires:
+      - name: marketplace-srv
+      - name: marketplace-auth
+    parameters:
+      service: saas-registry
+      service-plan: application
+      config:
+        xsappname: ~{marketplace-auth/XSAPPNAME}
+        appName: marketplace
+        displayName: Multi-tenant Spring Boot Application
+        appUrls:
+          onSubscription: https://${org}-${space}-mspa-srv.cfapps.us10-001.hana.ondemand.com/callback/v1.0/tenants/{tenantId}
+          onSubscriptionAsync: false
+          onUnSubscriptionAsync: false
+
+
