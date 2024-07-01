@@ -122,7 +122,7 @@ resources:
         appName: marketplace
         displayName: Multi-tenant Spring Boot Application
         appUrls:
-          onSubscription: https://${org}-${space}-mspa-srv.cfapps.us10-001.hana.ondemand.com/callback/v1.0/tenants/{tenantId}
+          onSubscription: https://${org}-${space}-marketplace-srv.cfapps.us10-001.hana.ondemand.com/callback/v1.0/tenants/{tenantId}
           onSubscriptionAsync: false
           onUnSubscriptionAsync: false
 
