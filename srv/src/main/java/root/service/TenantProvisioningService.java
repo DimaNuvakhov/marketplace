@@ -13,7 +13,7 @@ import static java.lang.String.format;
 @RequiredArgsConstructor
 public class TenantProvisioningService {
 
-    private static final String URL_PATTERN = "https://%s-mspa.cfapps.us10-001.hana.ondemand.com";
+    private static final String URL_PATTERN = "https://%s-marketplace.cfapps.us10-001.hana.ondemand.com";
     private static final String SUBSCRIBED_SUBDOMAIN_JSON_FIELD = "subscribedSubdomain";
 
     private final TenantProvisioningSchemaInitializr tenantProvisioningSchemaInitializr;
