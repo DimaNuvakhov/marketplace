@@ -4,6 +4,7 @@ version: 1.0.0-SNAPSHOT
 description: "A simple project."
 parameters:
   enable-parallel-deployments: true
+
 modules:
   - name: marketplace-srv
     type: java
@@ -16,20 +17,20 @@ modules:
       SPRING_PROFILES_ACTIVE: cloud,sandbox
       JBP_CONFIG_COMPONENTS: "jres: ['com.sap.xs.java.buildpack.jre.SAPMachineJRE']"
       JBP_CONFIG_SAP_MACHINE_JRE: '{ version: 17.+ }'
+    requires:
+      - name: marketplace-auth
+      - name: marketplace-db
+      - name: marketplace-saas
     build-parameters:
       builder: custom
       commands:
         - mvn clean package -DskipTests=true
       build-result: target/*.jar
     provides:
-      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+      - name: srv-api
         properties:
           srv-url: ${default-url}
-    requires:
-      - name: app-api
-        properties:
-          CDS_MULTITENANCY_APPUI_URL: ~{url}
-      - name: marketplace-auth
+
 
   - name: marketplace
     type: approuter.nodejs
@@ -106,8 +107,6 @@ resources:
     parameters:
       service: hana
       service-plan: schema
-      config:
-        database_id: 92fa8e2c-ca56-4624-a636-3e3d7f87167c
 
   - name: marketplace-saas
     type: org.cloudfoundry.managed-service
